@@ -1,0 +1,9 @@
+C:\C#\Life\Life\bin\Debug\Life.exe.config
+C:\C#\Life\Life\bin\Debug\Life.exe
+C:\C#\Life\Life\bin\Debug\Life.pdb
+C:\C#\Life\Life\obj\Debug\Life.csprojResolveAssemblyReference.cache
+C:\C#\Life\Life\obj\Debug\Life.Form1.resources
+C:\C#\Life\Life\obj\Debug\Life.Properties.Resources.resources
+C:\C#\Life\Life\obj\Debug\Life.csproj.GenerateResource.Cache
+C:\C#\Life\Life\obj\Debug\Life.exe
+C:\C#\Life\Life\obj\Debug\Life.pdb
