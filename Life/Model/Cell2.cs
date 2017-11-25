@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Life
 {
-    class Cell
+    class Cell2
     {
         private Button btCell = new Button();
         private int defLocX = 10;
@@ -37,7 +37,7 @@ namespace Life
         public int X { get; set; }
         public int Y { get; set; }
 
-        public Cell(int x, int y)
+        public Cell2(int x, int y)
         {
             X = x;
             Y = y;

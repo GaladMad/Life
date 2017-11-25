@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace Life
 {
-    class Board
+    class Board2
     {
         private int size;
         public int generation = 0;
-        public Cell[,] cells;
+        public Cell2[,] cells;
 
-        public Board(int size)
+        public Board2(int size)
         {
             this.size = size;
-            cells = new Cell[size, size];
+            cells = new Cell2[size, size];
 
             for (int i = 0; i < this.size; i++)
             {
                 for (int k = 0; k < this.size; k++)
                 {
-                    cells[i, k] = new Cell(i,k);
+                    cells[i, k] = new Cell2(i,k);
 
                     if (i == 0 || i == size - 1 || k == 0 || k == size - 1)
                     {
