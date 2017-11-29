@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Life.Model;
+using System.Collections.Generic;
 
 namespace Life
 {
@@ -30,6 +31,7 @@ namespace Life
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.bStart = new System.Windows.Forms.Button();
             this.bNext = new System.Windows.Forms.Button();
             this.lGeneration = new System.Windows.Forms.Label();
@@ -39,6 +41,7 @@ namespace Life
             this.panelMain = new System.Windows.Forms.Panel();
             this.panelGraphics = new System.Windows.Forms.Panel();
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.timerGeneration = new System.Windows.Forms.Timer(this.components);
             this.panelMain.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
@@ -141,6 +144,11 @@ namespace Life
             this.tableLayoutPanel.Size = new System.Drawing.Size(722, 733);
             this.tableLayoutPanel.TabIndex = 0;
             // 
+            // timerGeneration
+            // 
+            this.timerGeneration.Interval = 500;
+            this.timerGeneration.Tick += new System.EventHandler(this.timerGeneration_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -170,8 +178,8 @@ namespace Life
         private System.Windows.Forms.Button Cell;
         private System.Windows.Forms.Panel panelGraphics;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
-        //private Board board;
-
+        Board board = new Board(53);
+        private System.Windows.Forms.Timer timerGeneration;
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Life.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,18 +21,18 @@ namespace Life
 
         private void bStart_Click(object sender, EventArgs e)
         {
-            bool freez;
+            //bool freez;
 
             if(bStart.Text == "Start")
             {
                 bStart.Text = "Stop";
-                freez = false;
+                //freez = false;
 
             }
             else
             {
                 bStart.Text = "Start";
-                freez = true;
+                //freez = true;
             }
 
 
@@ -45,14 +46,16 @@ namespace Life
 
         private void bNext_Click(object sender, EventArgs e)
         {
-            //board.CheckALife();
-            //this.lCountGeneration.Text = Convert.ToString(board.generation);
+            board.CheckALife();
+            this.lCountGeneration.Text = Convert.ToString(board.generation);
+            panelGraphics.Invalidate();
         }
 
         private void bClear_Click(object sender, EventArgs e)
         {
-            //board.Clear();
-            //this.lCountGeneration.Text = "0";
+            board.Clear();
+            this.lCountGeneration.Text = "0";
+            panelGraphics.Invalidate();
         }
 
         private void Cell_Click(object sender, EventArgs e)
@@ -69,19 +72,26 @@ namespace Life
 
         private void panel_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-            Pen myP = new Pen(Color.Black);
-            Brush myB = new SolidBrush(Color.Red);
-            g.DrawRectangle(myP, 10, 10, 520, 520);
-            g.FillRectangle(myB, 20, 20, 50, 50);
+            
+            Graphics graphics = e.Graphics;
 
+            board.draw(graphics);
         }
 
         private void panel_MouseClick(object sender, MouseEventArgs e)
         {
-            int x = e.X - 10;
-            int y = e.Y - 10;
-            this.lGeneration.Text = $"X={x}, Y={y}";
+            
+            int x = e.X;
+            int y = e.Y;
+            //this.lGeneration.Text = $"X={x/10}, Y={y/10}";
+
+            board.cells[(e.X) / 10, (e.Y) / 10].changeAlive();
+            panelGraphics.Invalidate();
+        }
+
+        private void timerGeneration_Tick(object sender, EventArgs e)
+        {
+            Invalidate();
         }
     }
 }
