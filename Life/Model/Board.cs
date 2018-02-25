@@ -37,7 +37,7 @@ namespace Life.Model
             }
         }
 
-        public void CheckALife()
+        public void CheckALive()
         {
             for (int i = 0; i < this.boardSize; i++)
             {
@@ -47,17 +47,17 @@ namespace Life.Model
                     if (i != 0 && i != boardSize - 1 && k != 0 && k != boardSize - 1)
                     {
 
-                        if (cells[i, k].WasAlife == false && CountNeighbors(i, k) == 3)
+                        if (cells[i, k].WasAlive == false && CountNeighbors(i, k) == 3)
                         {
-                            cells[i, k].IsAlife = true;
+                            cells[i, k].IsAlive = true;
                         }
-                        else if (cells[i, k].WasAlife == true && (CountNeighbors(i, k) == 2 || CountNeighbors(i, k) == 3))
+                        else if (cells[i, k].WasAlive == true && (CountNeighbors(i, k) == 2 || CountNeighbors(i, k) == 3))
                         {
 
                         }
                         else
                         {
-                            cells[i, k].IsAlife = false;
+                            cells[i, k].IsAlive = false;
                         }
                     }
                 }
@@ -66,7 +66,7 @@ namespace Life.Model
 
             foreach (var cell in cells)
             {
-                cell.WasAlife = cell.IsAlife;
+                cell.WasAlive = cell.IsAlive;
             }
 
             generation++;
@@ -81,7 +81,7 @@ namespace Life.Model
                 {
                     if ((i != 0 && k != 0) || (i != 0 && k == 0) || (i == 0 && k != 0))
                     {
-                        if (cells[x + i, y + k].WasAlife)
+                        if (cells[x + i, y + k].WasAlive)
                         {
                             neighbors++;
                         }
@@ -116,9 +116,11 @@ namespace Life.Model
         {
             foreach (var cell in cells)
             {
-                cell.IsAlife=false;
-                cell.WasAlife = false;
+                cell.IsAlive=false;
+                cell.WasAlive = false;
             }
+
+            generation = 0;
         }
     }
 }

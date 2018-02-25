@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,34 +22,23 @@ namespace Life
 
         private void bStart_Click(object sender, EventArgs e)
         {
-            //bool freez;
 
             if(bStart.Text == "Start")
             {
                 bStart.Text = "Stop";
-                //freez = false;
+                timerGeneration.Enabled = true;
 
             }
             else
             {
                 bStart.Text = "Start";
-                //freez = true;
+                timerGeneration.Enabled = false;
             }
-
-
-            for (int i = 0; i < 100; i++)
-            {
-                //board.CheckALife();
-                //this.lCountGeneration.Text = Convert.ToString(board.generation);
-            }
-            
         }
 
         private void bNext_Click(object sender, EventArgs e)
         {
-            board.CheckALife();
-            this.lCountGeneration.Text = Convert.ToString(board.generation);
-            panelGraphics.Invalidate();
+            createNewGeneration();
         }
 
         private void bClear_Click(object sender, EventArgs e)
@@ -91,7 +81,14 @@ namespace Life
 
         private void timerGeneration_Tick(object sender, EventArgs e)
         {
-            Invalidate();
+            createNewGeneration();
+        }
+
+        private void createNewGeneration()
+        {
+            board.CheckALive();
+            this.lCountGeneration.Text = Convert.ToString(board.generation);
+            panelGraphics.Invalidate();
         }
     }
 }

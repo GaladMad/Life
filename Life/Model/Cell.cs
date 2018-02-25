@@ -13,8 +13,8 @@ namespace Life.Model
         #region properties and fields
         private static int size = 10;
         private int x, y;
-        private bool isAlife = false;
-        private bool wasAlife = false;
+        private bool isAlive = false;
+        private bool wasAlive = false;
         private bool isOnBorder = false;
         private Graphics graphics;
 
@@ -28,15 +28,15 @@ namespace Life.Model
             get { return isOnBorder; }
             set { isOnBorder = value; }
         }
-        public bool IsAlife
+        public bool IsAlive
         {
-            get { return isAlife; }
-            set { isAlife = value; }
+            get { return isAlive; }
+            set { isAlive = value; }
         }
-        public bool WasAlife
+        public bool WasAlive
         {
-            get { return wasAlife; }
-            set { wasAlife = value; }
+            get { return wasAlive; }
+            set { wasAlive = value; }
         }
         public int X { get; set; }
         public int Y { get; set; }
@@ -53,7 +53,7 @@ namespace Life.Model
             this.graphics = graphics;
             
             Brush newBrush;
-            if (isAlife)
+            if (isAlive)
             {
                 newBrush = new SolidBrush(Color.Black);
             }
@@ -67,16 +67,16 @@ namespace Life.Model
 
         public void changeAlive()
         {
-            if (isAlife)
+            if (isAlive)
             {
-                isAlife = false;
+                isAlive = false;
             }
             else
             {
-                isAlife = true;
+                isAlive = true;
             }
 
-            wasAlife = isAlife;
+            wasAlive = isAlive;
         }
     }
 }
