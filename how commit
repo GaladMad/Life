@@ -1,0 +1,635 @@
+[33mcommit 95cf9837662586a52f8a4ee3080ec37eccb87d60[m
+Author: GaladMad <kam.fedio@gmail.com>
+Date:   Wed Nov 29 22:23:21 2017 +0100
+
+    Implementation of drawing using the Graphics class
+
+[1mdiff --git a/.vs/Life/v14/.suo b/.vs/Life/v14/.suo[m
+[1mindex 6351ee3..983b741 100644[m
+Binary files a/.vs/Life/v14/.suo and b/.vs/Life/v14/.suo differ
+[1mdiff --git a/Life/Life.csproj b/Life/Life.csproj[m
+[1mindex 1101f8e..7abb60b 100644[m
+[1m--- a/Life/Life.csproj[m
+[1m+++ b/Life/Life.csproj[m
+[36m@@ -46,9 +46,8 @@[m
+     <Reference Include="System.Xml" />[m
+   </ItemGroup>[m
+   <ItemGroup>[m
+[31m-    <Compile Include="Model\Board2.cs" />[m
+[32m+[m[32m    <Compile Include="Model\Board.cs" />[m
+     <Compile Include="Model\Cell.cs" />[m
+[31m-    <Compile Include="Model\Cell2.cs" />[m
+     <Compile Include="View\Form1.cs">[m
+       <SubType>Form</SubType>[m
+     </Compile>[m
+[1mdiff --git a/Life/Model/Board.cs b/Life/Model/Board.cs[m
+[1mnew file mode 100644[m
+[1mindex 0000000..20955dd[m
+[1m--- /dev/null[m
+[1m+++ b/Life/Model/Board.cs[m
+[36m@@ -0,0 +1,124 @@[m
+[32m+[m[32m﻿using System;[m
+[32m+[m[32musing System.Collections.Generic;[m
+[32m+[m[32musing System.Drawing;[m
+[32m+[m[32musing System.Linq;[m
+[32m+[m[32musing System.Text;[m
+[32m+[m[32musing System.Threading.Tasks;[m
+[32m+[m[32musing System.Windows.Forms;[m
+[32m+[m
+[32m+[m[32mnamespace Life.Model[m
+[32m+[m[32m{[m
+[32m+[m[32m    class Board[m
+[32m+[m[32m    {[m
+[32m+[m[32m        #region properties and fields[m
+[32m+[m[32m        private int boardSize;[m
+[32m+[m[32m        public int generation = 0;[m
+[32m+[m[32m        public Cell[,] cells;[m
+[32m+[m
+[32m+[m[32m        #endregion[m
+[32m+[m
+[32m+[m[32m        public Board(int boardSize)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            this.boardSize = boardSize;[m
+[32m+[m[32m            cells = new Cell[boardSize, boardSize];[m
+[32m+[m
+[32m+[m[32m            for (int i = 0; i < this.boardSize; i++)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                for (int k = 0; k < this.boardSize; k++)[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    cells[i, k] = new Cell(i, k);[m
+[32m+[m
+[32m+[m[32m                    if (i == 0 || i == boardSize - 1 || k == 0 || k == boardSize - 1)[m
+[32m+[m[32m                    {[m
+[32m+[m[32m                        cells[i, k].IsOnBorder = true;[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public void CheckALife()[m
+[32m+[m[32m        {[m
+[32m+[m[32m            for (int i = 0; i < this.boardSize; i++)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                for (int k = 0; k < this.boardSize; k++)[m
+[32m+[m[32m                {[m
+[32m+[m
+[32m+[m[32m                    if (i != 0 && i != boardSize - 1 && k != 0 && k != boardSize - 1)[m
+[32m+[m[32m                    {[m
+[32m+[m
+[32m+[m[32m                        if (cells[i, k].WasAlife == false && CountNeighbors(i, k) == 3)[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            cells[i, k].IsAlife = true;[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                        else if (cells[i, k].WasAlife == true && (CountNeighbors(i, k) == 2 || CountNeighbors(i, k) == 3))[m
+[32m+[m[32m                        {[m
+[32m+[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                        else[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            cells[i, k].IsAlife = false;[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            foreach (var cell in cells)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                cell.WasAlife = cell.IsAlife;[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            generation++;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        private int CountNeighbors(int x, int y)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            int neighbors = 0;[m
+[32m+[m[32m            for (int i = -1; i < 2; i++)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                for (int k = -1; k < 2; k++)[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    if ((i != 0 && k != 0) || (i != 0 && k == 0) || (i == 0 && k != 0))[m
+[32m+[m[32m                    {[m
+[32m+[m[32m                        if (cells[x + i, y + k].WasAlife)[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            neighbors++;[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            return neighbors;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public void draw(Graphics graphics)[m
+[32m+[m[32m        {[m
+[32m+[m
+[32m+[m[32m            foreach (var cell in cells)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                cell.draw(graphics);[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            Pen pen = new Pen(Color.Black);[m
+[32m+[m[32m            graphics.DrawRectangle(pen, 0, 0, boardSize * Cell.cellSize, boardSize * Cell.cellSize);[m
+[32m+[m
+[32m+[m[32m            int grid = Cell.cellSize;[m
+[32m+[m
+[32m+[m[32m            for (int i = 1; i < boardSize; i++)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                graphics.DrawLine(pen, i * grid, 0, i * grid, boardSize * grid);[m
+[32m+[m[32m                graphics.DrawLine(pen, 0, i * grid, boardSize * grid, i * grid);[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public void Clear()[m
+[32m+[m[32m        {[m
+[32m+[m[32m            foreach (var cell in cells)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                cell.IsAlife=false;[m
+[32m+[m[32m                cell.WasAlife = false;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/Life/Model/Board2.cs b/Life/Model/Board2.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 4c8080d..0000000[m
+[1m--- a/Life/Model/Board2.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,125 +0,0 @@[m
+[31m-﻿using System;[m
+[31m-using System.Collections.Generic;[m
+[31m-using System.Linq;[m
+[31m-using System.Text;[m
+[31m-using System.Threading.Tasks;[m
+[31m-[m
+[31m-namespace Life[m
+[31m-{[m
+[31m-    class Board2[m
+[31m-    {[m
+[31m-        private int size;[m
+[31m-        public int generation = 0;[m
+[31m-        public Cell2[,] cells;[m
+[31m-[m
+[31m-        public Board2(int size)[m
+[31m-        {[m
+[31m-            this.size = size;[m
+[31m-            cells = new Cell2[size, size];[m
+[31m-[m
+[31m-            for (int i = 0; i < this.size; i++)[m
+[31m-            {[m
+[31m-                for (int k = 0; k < this.size; k++)[m
+[31m-                {[m
+[31m-                    cells[i, k] = new Cell2(i,k);[m
+[31m-[m
+[31m-                    if (i == 0 || i == size - 1 || k == 0 || k == size - 1)[m
+[31m-                    {[m
+[31m-                        cells[i, k].IsOnBorder = true;[m
+[31m-                    }[m
+[31m-                }[m
+[31m-[m
+[31m-            }[m
+[31m-        }[m
+[31m-[m
+[31m-        public void CheckALife()[m
+[31m-        {[m
+[31m-            for (int i = 0; i < this.size; i++)[m
+[31m-            {[m
+[31m-                for (int k = 0; k < this.size; k++)[m
+[31m-                {[m
+[31m-[m
+[31m-                    if (i != 0 && i != size - 1 && k != 0 && k != size - 1)[m
+[31m-                    {[m
+[31m-                        [m
+[31m-                        if(cells[i,k].WasAlife == false && CountNeighbors(i, k) == 3)[m
+[31m-                        {[m
+[31m-                            cells[i, k].IsAlife = true;[m
+[31m-                        }[m
+[31m-                        else if (cells[i, k].WasAlife == true && (CountNeighbors(i, k) == 2 || CountNeighbors(i, k) == 3))[m
+[31m-                        {[m
+[31m-[m
+[31m-                        }else[m
+[31m-                        {[m
+[31m-                            cells[i, k].IsAlife = false;[m
+[31m-                        }[m
+[31m-                    }[m
+[31m-                }[m
+[31m-[m
+[31m-            }[m
+[31m-[m
+[31m-            for (int i = 0; i < this.size; i++)[m
+[31m-            {[m
+[31m-                for (int k = 0; k < this.size; k++)[m
+[31m-                {[m
+[31m-                    cells[i, k].WasAlife = cells[i, k].IsAlife;[m
+[31m-[m
+[31m-                    if (cells[i, k].IsAlife == true)[m
+[31m-                    {[m
+[31m-                        cells[i, k].bCell.BackColor = System.Drawing.SystemColors.Control;[m
+[31m-                    }[m
+[31m-                    else[m
+[31m-                    {[m
+[31m-                        cells[i, k].bCell.BackColor = System.Drawing.SystemColors.ActiveCaptionText;[m
+[31m-                    }[m
+[31m-                }[m
+[31m-[m
+[31m-            }[m
+[31m-[m
+[31m-            generation++;[m
+[31m-        }[m
+[31m-[m
+[31m-        private int CountNeighbors(int x, int y)[m
+[31m-        {[m
+[31m-            int neighbors = 0;[m
+[31m-            for(int i=-1; i < 2; i++)[m
+[31m-            {[m
+[31m-                for (int k = -1; k < 2; k++)[m
+[31m-                {[m
+[31m-                    if((i!=0 && k != 0) || (i != 0 && k == 0) || (i == 0 && k != 0))[m
+[31m-                    {[m
+[31m-                        if (cells[x + i, y + k].WasAlife)[m
+[31m-                        {[m
+[31m-                            neighbors++;[m
+[31m-                        }[m
+[31m-                    }[m
+[31m-                }[m
+[31m-            }[m
+[31m-            [m
+[31m-            return neighbors;[m
+[31m-        }[m
+[31m-[m
+[31m-        public void AddToPanel(System.Windows.Forms.Panel panel)[m
+[31m-        {[m
+[31m-            for (int i = 0; i < this.size; i++)[m
+[31m-            {[m
+[31m-                for (int k = 0; k < this.size; k++)[m
+[31m-                {[m
+[31m-                    panel.Controls.Add(cells[i, k].bCell);[m
+[31m-                }[m
+[31m-[m
+[31m-            }[m
+[31m-        }[m
+[31m-[m
+[31m-        public void Clear()[m
+[31m-        {[m
+[31m-            foreach (var cell in cells)[m
+[31m-            {[m
+[31m-                cell.IsAlife = false;[m
+[31m-                cell.WasAlife = cell.IsAlife;[m
+[31m-                cell.bCell.BackColor = System.Drawing.SystemColors.ActiveCaptionText;[m
+[31m-                generation = 0;[m
+[31m-            }[m
+[31m-        }[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/Life/Model/Cell.cs b/Life/Model/Cell.cs[m
+[1mindex 6936b47..98d70ee 100644[m
+[1m--- a/Life/Model/Cell.cs[m
+[1m+++ b/Life/Model/Cell.cs[m
+[36m@@ -1,20 +1,82 @@[m
+ ﻿using System;[m
+ using System.Collections.Generic;[m
+[32m+[m[32musing System.Drawing;[m
+ using System.Linq;[m
+ using System.Text;[m
+ using System.Threading.Tasks;[m
+[32m+[m[32musing System.Windows.Forms;[m
+ [m
+ namespace Life.Model[m
+ {[m
+     class Cell[m
+     {[m
+         #region properties and fields[m
+[31m-        [m
+[32m+[m[32m        private static int size = 10;[m
+[32m+[m[32m        private int x, y;[m
+[32m+[m[32m        private bool isAlife = false;[m
+[32m+[m[32m        private bool wasAlife = false;[m
+[32m+[m[32m        private bool isOnBorder = false;[m
+[32m+[m[32m        private Graphics graphics;[m
+[32m+[m
+[32m+[m[32m        public static int cellSize[m
+[32m+[m[32m        {[m
+[32m+[m[32m            get { return size; }[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public bool IsOnBorder[m
+[32m+[m[32m        {[m
+[32m+[m[32m            get { return isOnBorder; }[m
+[32m+[m[32m            set { isOnBorder = value; }[m
+[32m+[m[32m        }[m
+[32m+[m[32m        public bool IsAlife[m
+[32m+[m[32m        {[m
+[32m+[m[32m            get { return isAlife; }[m
+[32m+[m[32m            set { isAlife = value; }[m
+[32m+[m[32m        }[m
+[32m+[m[32m        public bool WasAlife[m
+[32m+[m[32m        {[m
+[32m+[m[32m            get { return wasAlife; }[m
+[32m+[m[32m            set { wasAlife = value; }[m
+[32m+[m[32m        }[m
+[32m+[m[32m        public int X { get; set; }[m
+[32m+[m[32m        public int Y { get; set; }[m
+         #endregion[m
+ [m
+[31m-        public Cell()[m
+[32m+[m[32m        public Cell(int x, int y)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            this.x = x;[m
+[32m+[m[32m            this.y = y;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public void draw(Graphics graphics)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            this.graphics = graphics;[m
+[32m+[m[41m            [m
+[32m+[m[32m            Brush newBrush;[m
+[32m+[m[32m            if (isAlife)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                newBrush = new SolidBrush(Color.Black);[m
+[32m+[m[32m            }[m
+[32m+[m[32m            else[m
+[32m+[m[32m            {[m
+[32m+[m[32m                newBrush = new SolidBrush(Color.White);[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            graphics.FillRectangle(newBrush, x * size, y * size, size, size);[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        public void changeAlive()[m
+         {[m
+[32m+[m[32m            if (isAlife)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                isAlife = false;[m
+[32m+[m[32m            }[m
+[32m+[m[32m            else[m
+[32m+[m[32m            {[m
+[32m+[m[32m                isAlife = true;[m
+[32m+[m[32m            }[m
+ [m
+[32m+[m[32m            wasAlife = isAlife;[m
+         }[m
+     }[m
+ }[m
+[1mdiff --git a/Life/Model/Cell2.cs b/Life/Model/Cell2.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 6874161..0000000[m
+[1m--- a/Life/Model/Cell2.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,71 +0,0 @@[m
+[31m-﻿using System;[m
+[31m-using System.Collections.Generic;[m
+[31m-using System.Linq;[m
+[31m-using System.Text;[m
+[31m-using System.Threading.Tasks;[m
+[31m-using System.Windows.Forms;[m
+[31m-[m
+[31m-namespace Life[m
+[31m-{[m
+[31m-    class Cell2[m
+[31m-    {[m
+[31m-        private Button btCell = new Button();[m
+[31m-        private int defLocX = 10;[m
+[31m-        private int defLocY = 70;[m
+[31m-        private int size = 10;[m
+[31m-        private bool isAlife = false;[m
+[31m-        private bool wasAlife = false;[m
+[31m-        private bool isOnBorder = false;[m
+[31m-[m
+[31m-[m
+[31m-        public Button bCell { get { return btCell; } }[m
+[31m-        public bool IsOnBorder[m
+[31m-        {[m
+[31m-            get { return isOnBorder; }[m
+[31m-            set { isOnBorder = value; }[m
+[31m-        }[m
+[31m-        public bool IsAlife[m
+[31m-        {[m
+[31m-            get { return isAlife; }[m
+[31m-            set { isAlife = value; }[m
+[31m-        }[m
+[31m-        public bool WasAlife[m
+[31m-        {[m
+[31m-            get { return wasAlife; }[m
+[31m-            set { wasAlife = value; }[m
+[31m-        }[m
+[31m-        public int X { get; set; }[m
+[31m-        public int Y { get; set; }[m
+[31m-[m
+[31m-        public Cell2(int x, int y)[m
+[31m-        {[m
+[31m-            X = x;[m
+[31m-            Y = y;[m
+[31m-[m
+[31m-            btCell.BackColor = System.Drawing.SystemColors.ActiveCaptionText;[m
+[31m-            btCell.UseVisualStyleBackColor = false;[m
+[31m-            btCell.FlatStyle = System.Windows.Forms.FlatStyle.Flat;[m
+[31m-            btCell.ForeColor = System.Drawing.SystemColors.AppWorkspace;[m
+[31m-            btCell.Location = new System.Drawing.Point(defLocX + x*size, defLocY + y*size);[m
+[31m-            btCell.Size = new System.Drawing.Size(size, size);[m
+[31m-            btCell.Click += new System.EventHandler(bCell_Click);[m
+[31m-[m
+[31m-        }[m
+[31m-[m
+[31m-        private void bCell_Click(object sender, EventArgs e)[m
+[31m-        {[m
+[31m-            if(isAlife == false)[m
+[31m-            {[m
+[31m-                isAlife = true;[m
+[31m-                btCell.BackColor = System.Drawing.SystemColors.Control;[m
+[31m-            }[m
+[31m-            else[m
+[31m-            {[m
+[31m-                isAlife = false;[m
+[31m-                btCell.BackColor = System.Drawing.SystemColors.ActiveCaptionText;[m
+[31m-            }[m
+[31m-[m
+[31m-            wasAlife = isAlife;[m
+[31m-        }[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/Life/View/Form1.Designer.cs b/Life/View/Form1.Designer.cs[m
+[1mindex 7a85968..b3fdbc1 100644[m
+[1m--- a/Life/View/Form1.Designer.cs[m
+[1m+++ b/Life/View/Form1.Designer.cs[m
+[36m@@ -1,4 +1,5 @@[m
+[31m-﻿using System.Collections.Generic;[m
+[32m+[m[32m﻿using Life.Model;[m
+[32m+[m[32musing System.Collections.Generic;[m
+ [m
+ namespace Life[m
+ {[m
+[36m@@ -30,6 +31,7 @@[m [mnamespace Life[m
+         /// </summary>[m
+         private void InitializeComponent()[m
+         {[m
+[32m+[m[32m            this.components = new System.ComponentModel.Container();[m
+             this.bStart = new System.Windows.Forms.Button();[m
+             this.bNext = new System.Windows.Forms.Button();[m
+             this.lGeneration = new System.Windows.Forms.Label();[m
+[36m@@ -39,6 +41,7 @@[m [mnamespace Life[m
+             this.panelMain = new System.Windows.Forms.Panel();[m
+             this.panelGraphics = new System.Windows.Forms.Panel();[m
+             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();[m
+[32m+[m[32m            this.timerGeneration = new System.Windows.Forms.Timer(this.components);[m
+             this.panelMain.SuspendLayout();[m
+             this.tableLayoutPanel.SuspendLayout();[m
+             this.SuspendLayout();[m
+[36m@@ -141,6 +144,11 @@[m [mnamespace Life[m
+             this.tableLayoutPanel.Size = new System.Drawing.Size(722, 733);[m
+             this.tableLayoutPanel.TabIndex = 0;[m
+             // [m
+[32m+[m[32m            // timerGeneration[m
+[32m+[m[32m            //[m[41m [m
+[32m+[m[32m            this.timerGeneration.Interval = 500;[m
+[32m+[m[32m            this.timerGeneration.Tick += new System.EventHandler(this.timerGeneration_Tick);[m
+[32m+[m[32m            //[m[41m [m
+             // Form1[m
+             // [m
+             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);[m
+[36m@@ -170,8 +178,8 @@[m [mnamespace Life[m
+         private System.Windows.Forms.Button Cell;[m
+         private System.Windows.Forms.Panel panelGraphics;[m
+         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;[m
+[31m-        //private Board board;[m
+[31m-[m
+[32m+[m[32m        Board board = new Board(53);[m
+[32m+[m[32m        private System.Windows.Forms.Timer timerGeneration;[m
+     }[m
+ }[m
+ [m
+[1mdiff --git a/Life/View/Form1.cs b/Life/View/Form1.cs[m
+[1mindex 3342ef6..67c16f0 100644[m
+[1m--- a/Life/View/Form1.cs[m
+[1m+++ b/Life/View/Form1.cs[m
+[36m@@ -1,4 +1,5 @@[m
+[31m-﻿using System;[m
+[32m+[m[32m﻿using Life.Model;[m
+[32m+[m[32musing System;[m
+ using System.Collections.Generic;[m
+ using System.ComponentModel;[m
+ using System.Data;[m
+[36m@@ -20,18 +21,18 @@[m [mnamespace Life[m
+ [m
+         private void bStart_Click(object sender, EventArgs e)[m
+         {[m
+[31m-            bool freez;[m
+[32m+[m[32m            //bool freez;[m
+ [m
+             if(bStart.Text == "Start")[m
+             {[m
+                 bStart.Text = "Stop";[m
+[31m-                freez = false;[m
+[32m+[m[32m                //freez = false;[m
+ [m
+             }[m
+             else[m
+             {[m
+                 bStart.Text = "Start";[m
+[31m-                freez = true;[m
+[32m+[m[32m                //freez = true;[m
+             }[m
+ [m
+ [m
+[36m@@ -45,14 +46,16 @@[m [mnamespace Life[m
+ [m
+         private void bNext_Click(object sender, EventArgs e)[m
+         {[m
+[31m-            //board.CheckALife();[m
+[31m-            //this.lCountGeneration.Text = Convert.ToString(board.generation);[m
+[32m+[m[32m            board.CheckALife();[m
+[32m+[m[32m            this.lCountGeneration.Text = Convert.ToString(board.generation);[m
+[32m+[m[32m            panelGraphics.Invalidate();[m
+         }[m
+ [m
+         private void bClear_Click(object sender, EventArgs e)[m
+         {[m
+[31m-            //board.Clear();[m
+[31m-            //this.lCountGeneration.Text = "0";[m
+[32m+[m[32m            board.Clear();[m
+[32m+[m[32m            this.lCountGeneration.Text = "0";[m
+[32m+[m[32m            panelGraphics.Invalidate();[m
+         }[m
+ [m
+         private void Cell_Click(object sender, EventArgs e)[m
+[36m@@ -69,19 +72,26 @@[m [mnamespace Life[m
+ [m
+         private void panel_Paint(object sender, PaintEventArgs e)[m
+         {[m
+[31m-            Graphics g = e.Graphics;[m
+[31m-            Pen myP = new Pen(Color.Black);[m
+[31m-            Brush myB = new SolidBrush(Color.Red);[m
+[31m-            g.DrawRectangle(myP, 10, 10, 520, 520);[m
+[31m-            g.FillRectangle(myB, 20, 20, 50, 50);[m
+[32m+[m[41m            [m
+[32m+[m[32m            Graphics graphics = e.Graphics;[m
+ [m
+[32m+[m[32m            board.draw(graphics);[m
+         }[m
+ [m
+         private void panel_MouseClick(object sender, MouseEventArgs e)[m
+         {[m
+[31m-            int x = e.X - 10;[m
+[31m-            int y = e.Y - 10;[m
+[31m-            this.lGeneration.Text = $"X={x}, Y={y}";[m
+[32m+[m[41m            [m
+[32m+[m[32m            int x = e.X;[m
+[32m+[m[32m            int y = e.Y;[m
+[32m+[m[32m            //this.lGeneration.Text = $"X={x/10}, Y={y/10}";[m
+[32m+[m
+[32m+[m[32m            board.cells[(e.X) / 10, (e.Y) / 10].changeAlive();[m
+[32m+[m[32m            panelGraphics.Invalidate();[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        private void timerGeneration_Tick(object sender, EventArgs e)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            Invalidate();[m
+         }[m
+     }[m
+ }[m
+[1mdiff --git a/Life/View/Form1.resx b/Life/View/Form1.resx[m
+[1mindex 1af7de1..d13d9b1 100644[m
+[1m--- a/Life/View/Form1.resx[m
+[1m+++ b/Life/View/Form1.resx[m
+[36m@@ -117,4 +117,7 @@[m
+   <resheader name="writer">[m
+     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>[m
+   </resheader>[m
+[32m+[m[32m  <metadata name="timerGeneration.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">[m
+[32m+[m[32m    <value>17, 17</value>[m
+[32m+[m[32m  </metadata>[m
+ </root>[m
+\ No newline at end of file[m
+[1mdiff --git a/Life/bin/Debug/Life.exe b/Life/bin/Debug/Life.exe[m
+[1mindex 0702c86..fa8a5b0 100644[m
+Binary files a/Life/bin/Debug/Life.exe and b/Life/bin/Debug/Life.exe differ
+[1mdiff --git a/Life/bin/Debug/Life.pdb b/Life/bin/Debug/Life.pdb[m
+[1mindex 7bf9aa8..fba7806 100644[m
+Binary files a/Life/bin/Debug/Life.pdb and b/Life/bin/Debug/Life.pdb differ
+[1mdiff --git a/Life/bin/Debug/Life.vshost.exe.manifest b/Life/bin/Debug/Life.vshost.exe.manifest[m
+[1mnew file mode 100644[m
+[1mindex 0000000..061c9ca[m
+[1m--- /dev/null[m
+[1m+++ b/Life/bin/Debug/Life.vshost.exe.manifest[m
+[36m@@ -0,0 +1,11 @@[m
+[32m+[m[32m﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>[m
+[32m+[m[32m<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">[m
+[32m+[m[32m  <assemblyIdentity version="1.0.0.0" name="MyApplication.app"/>[m
+[32m+[m[32m  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">[m
+[32m+[m[32m    <security>[m
+[32m+[m[32m      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">[m
+[32m+[m[32m        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>[m
+[32m+[m[32m      </requestedPrivileges>[m
+[32m+[m[32m    </security>[m
+[32m+[m[32m  </trustInfo>[m
+[32m+[m[32m</assembly>[m
+[1mdiff --git a/Life/obj/Debug/Life.csproj.GenerateResource.Cache b/Life/obj/Debug/Life.csproj.GenerateResource.Cache[m
+[1mindex ccdd2b0..1608e5f 100644[m
+Binary files a/Life/obj/Debug/Life.csproj.GenerateResource.Cache and b/Life/obj/Debug/Life.csproj.GenerateResource.Cache differ
+[1mdiff --git a/Life/obj/Debug/Life.exe b/Life/obj/Debug/Life.exe[m
+[1mindex 0702c86..fa8a5b0 100644[m
+Binary files a/Life/obj/Debug/Life.exe and b/Life/obj/Debug/Life.exe differ
+[1mdiff --git a/Life/obj/Debug/Life.pdb b/Life/obj/Debug/Life.pdb[m
+[1mindex 7bf9aa8..fba7806 100644[m
+Binary files a/Life/obj/Debug/Life.pdb and b/Life/obj/Debug/Life.pdb differ
